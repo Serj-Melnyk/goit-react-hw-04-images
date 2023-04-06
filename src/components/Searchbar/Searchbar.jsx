@@ -4,67 +4,57 @@ import { SearchHead, Form, Field, Button, } from "./SearchbarStyled";
 import { GoSearch } from "react-icons/go";
 
 
-import { Component } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 
-export class Searchbar extends Component {
-
-    state = {
-        value: ''     
-    }
+export const Searchbar = ({onSubmit}) => {
+    
+    const [value, setValue] = useState('');
 
 
-    handleChange = ({ target: { value } }) => {
-   
-        this.setState({ value })    
-    }
+    const handleChange = (evt) => {
+        setValue(evt.target.value)
+    };
 
-
-    // handleChange = (evt) => {
-    //     this.setState({value : evt.currentTarget.value})
-    // }
-
-    handleSubmit = (evt) => {
+   const handleSubmit = (evt) => {
         evt.preventDefault()
-        if (!this.state.value.trim()) {
+        if (!value.trim()) {
             return toast.success('The search field is empty');
          
         }
 
-        this.props.onSubmit(this.state.value)
-        this.setState({ value: '' })
+       onSubmit(value);
+       setValue('');
         
     };
 
-    
-    render() {
-        
-        return (
+          
+    return (
 
-            <SearchHead >
+        <SearchHead >
 
-                <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={handleSubmit}>
                 
-                    <Button type="submit" className="button">
-                        <span className="button-label"> <GoSearch /> </span>
-                    </Button>
+                <Button type="submit" className="button">
+                    <span className="button-label"> <GoSearch /> </span>
+                </Button>
 
-                    <Field
-                        className="input"
-                        type="text"
-                        aria-label="search"
-                        placeholder="Search images and photos"
-                        value={this.state.value}
-                        onChange={this.handleChange} />
+                <Field
+                    className="input"
+                    type="text"
+                    aria-label="search"
+                    placeholder="Search images and photos"
+                    value={value}
+                    onChange={handleChange} />
 
-                </Form>
+            </Form>
 
-             </SearchHead>
+        </SearchHead>
             
-        );
-    }
+    );
 };
+
 
 Searchbar.propTypes = {
     onChange: PropTypes.func

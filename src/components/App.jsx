@@ -1,5 +1,5 @@
 
-import { Component } from "react";
+import { useState } from "react";
 import { GlobalStyle } from "./GlobalStyle";
 import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { Layout } from "./Layout/LayoutStyled";
@@ -7,43 +7,33 @@ import { Searchbar } from "./Searchbar/Searchbar";
 import { Toaster } from "react-hot-toast";
 
 
-export class App extends Component {
+export const App = () => {
 
-  state = {
-    textSearch: ''
+  const [textSearch, setTextSearch] = useState('')
+
+
+  const handleSubmit = (textSearch) => {
+    setTextSearch( textSearch )
   };
 
+  return (
 
-  handleSubmit = (textSearch) => {
-    this.setState({ textSearch })
-  };
+    <Layout>
 
-  
-  render() {
-    
-    const { textSearch} = this.state
-
-
-    return (
-
-      <Layout>  
-
-        <Toaster
-           position="top-right"
-           reverseOrder={false} />
+      <Toaster
+        position="top-right"
+        reverseOrder={false} />
         
-        <Searchbar onSubmit={this.handleSubmit} />
+      <Searchbar onSubmit={handleSubmit} />
 
-        <ImageGallery value={textSearch} />
+      <ImageGallery value={textSearch} />
 
       
-        <GlobalStyle />
+      <GlobalStyle />
         
     </Layout>
-    );
+  );
     
-  }
-  
 };
 
 
