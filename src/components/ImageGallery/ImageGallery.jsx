@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useEffect, useState } from "react";
 import { ImageList } from "./ImageGalleryStyled";
 import { ImageGalleryItem } from "components/ImageGalleryItem/ImageGalleryItem";
 import { getImages } from "components/services/GetImages";
@@ -9,127 +9,191 @@ import PropTypes from "prop-types"
 
 
 
-export class ImageGallery extends Component {
+// export class ImageGallery extends Component {
 
-    state = {
-        searchQuery: '',
-        images: [],
-        loading: false,
-        error: '',
-        loadButton: false,
-        page: null,
+//     state = {
+//         searchQuery: '',
+//         images: [],
+//         loading: false,
+//         error: '',
+//         loadButton: false,
+//         page: null,
 
-    }
+//     }
 
+export const ImageGallery = ({ value }) => {
 
-    componentDidUpdate(prevProps, prevState) {
+    // const [searchQuery, setSearchQuery] = useState([]);
+    const [images, setImages] = useState([]);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [, setError] = useState('');
+    const [loadButton, setLoadButton] = useState(false)
 
-        if (prevProps.value !== this.props.value) {
+    useEffect(() => {
+
+        if (!value ) {
             
-            this.setState({
-                images: [],
-                page: 1,
-                searchQuery: this.props.value,
+            return; 
+        }
 
-            });
-          }
-        
+        setLoading(true);
+  
+          
 
-            if (prevState.searchQuery !== this.state.searchQuery
-                ||
-              (prevState.page !== this.state.page && this.state.page !== 1)) {
 
-                this.setState({
-                    loading: true,
-                    page: this.state.page
-                })
-                
+        getImages(value, page)
+            .then((response) => response.json())
+            .then((images) => {
+                if (images.total === 0) {
+                    return Promise.reject(new Error(toast.error('Incorrect request')))
+                }
             
-
-             getImages(this.props.value, this.state.page)
-                .then((response) => response.json())
-                .then((images) => {
-                    if (images.total === 0) {
-                        return Promise.reject(new Error(toast.error('Incorrect request')))
-                    }
-                   
-                    this.setState({
-                        images: [...this.state.images, ...images.hits],
-                       
-                    })
+                setImages (prevState => ([...prevState, ...images.hits]));
+              
 
                  
-                    if (images.hits.length !== 12) {
-                        return this.setState({ loadButton: false })
-                    }
+                if (images.hits.length !== 12) {
+                   return setLoadButton(false)
+                }
 
-                    this.setState({ loadButton: true });
+               setLoadButton(true);
                     
-                })
+            })
 
 
-                .catch((error) => {
-                    console.log('error :>> ', error)
-                    this.setState({ error })
-                })
+            .catch((error) => {
+                console.log('error :>> ', error)
+                setError(error);
+            })
                 
           
-                .finally(() => {
-                    this.setState({ loading: false })
-                })
-            }
-          
-    };
-
-    handleLoadPage = () => {
-        this.setState((prevState) => {
-            return {
-                page: prevState.page + 1
-            }
-        });
-    };
-
-
-    render() {
+            .finally(() => {
+                setLoading(false)
+            })
     
-        return (
 
-            <div>
 
-                   {this.state.loading && threeDots }
+    }, [page, value]);
 
-                <ImageList>
+
+    useEffect(() => {
+        if (page && page!== 1) {
+            return;
+        }
+        setPage(1)
+        
+        
+    }, [page])
+    
+
+    const handleLoadPage = () => {
+        setPage((prevPage => prevPage + 1));
+       
+    };
+
+    
+
+
+
+    // componentDidUpdate(prevProps, prevState) {
+
+    // if (prevValue !== value) {
+            
+    //     this.setState({
+    //         images: [],
+    //         page: 1,
+    //         value: this.props.value,
+
+    //     });
+    // }
+        
+
+    // if (prevState.value !== this.state.value
+    //     ||
+    //     (prevPage !== page && page !== 1)) {
+
+    //     this.setState({
+    //         loading: true,
+    //         page: this.state.page
+    //     })
+                
+            
+
+    //     getImages(value, page)
+    //         .then((response) => response.json())
+    //         .then((images) => {
+    //             if (images.total === 0) {
+    //                 return Promise.reject(new Error(toast.error('Incorrect request')))
+    //             }
+                   
+    //            setImages({images: [...images, ...images.hits],
+                       
+    //             })
+
+                 
+    //             if (images.hits.length !== 12) {
+    //                 return this.setState({ loadButton: false })
+    //             }
+
+    //             this.setState({ loadButton: true });
                     
-                {this.state.images.length > 0 && this.state.images.map((image) => {
+    //         })
+
+
+    //         .catch((error) => {
+    //             console.log('error :>> ', error)
+    //             setError( error )
+    //         })
+                
+          
+    //         .finally(() => {
+    //             setLoading( false )
+    //         })
+    // }
+          
+
+
+    // const handleLoadPage = () => {
+    //     setPage((prevPage => prevPage + 1));
+    // };
+
+
+ 
+    
+    return (
+
+        <div>
+
+            {loading && threeDots}
+
+            <ImageList>
+                    
+                {images.length > 0 && images.map((image) => {
 
                     return (
  
-                        <ImageGalleryItem   
+                        <ImageGalleryItem
                             image={image}
                             key={image.id} />
  
                     )
                 })}
 
-                {this.state.loadButton && this.state.images.length > 0
-                        && <Button onClick={this.handleLoadPage} />}
+                {loadButton && images.length > 0
+                    && <Button onClick={handleLoadPage} />}
              
-                </ImageList>
+            </ImageList>
                 
-                </div>
+        </div>
            
-        )
+    )
  
-    };
 
-};
-
+}
 
 ImageGallery.propTypes = {
    value:  PropTypes.string.isRequired
 
 }
-
-
-
 
