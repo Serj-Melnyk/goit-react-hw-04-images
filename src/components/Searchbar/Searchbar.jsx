@@ -10,12 +10,14 @@ import { toast } from "react-hot-toast";
 
 export const Searchbar = ({onSubmit}) => {
     
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState('')
 
 
-    const handleChange = (evt) => {
-        setValue(evt.target.value)
-    };
+
+
+   const handleChange = (evt) => {
+        setValue( evt.target.value)
+    }
 
    const handleSubmit = (evt) => {
         evt.preventDefault()
@@ -24,12 +26,14 @@ export const Searchbar = ({onSubmit}) => {
          
         }
 
-       onSubmit(value);
-       setValue('');
+        onSubmit(value)
+        setValue( '' )
         
     };
 
-          
+    
+
+        
     return (
 
         <SearchHead >
